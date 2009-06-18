@@ -12,6 +12,8 @@ module LaserLemon
           :characters => [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).sum
         )
         
+        columns << :token if columns.empty?
+        
         columns.each do |column|
           default_value_for column.to_sym do
             begin
