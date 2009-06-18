@@ -1,0 +1,21 @@
+= has_token
+
+== Installation
+
+In <tt>environment.rb</tt>:
+
+  Rails::Initializer.run do |config|
+    config.gem 'laserlemon-has_token', :lib => 'has_token', :source => 'http://gems.github.com'
+  end
+
+At your application root, run:
+
+  $ sudo rake gems:install
+
+== Example
+
+Coming soon...
+
+== Tips
+
+Coming soon...
