@@ -15,10 +15,12 @@ module LaserLemon
         columns << :token if columns.empty?
         
         columns.each do |column|
-          default_value_for column.to_sym do
+          attr_readonly column
+          
+          default_value_for column do
             begin
               token_value = Array.new(options[:length]){ options[:characters].rand }.join
-            end while exists?(column.to_sym => token_value)
+            end while exists?(column => token_value)
             token_value
           end
         end
