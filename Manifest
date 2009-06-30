@@ -1,0 +1,13 @@
+generators/has_token_migration/has_token_migration_generator.rb
+generators/has_token_migration/templates/migration.rb
+init.rb
+lib/has_token.rb
+lib/token.rb
+MIT-LICENSE
+Rakefile
+README.rdoc
+tasks/has_token_tasks.rake
+test/has_token_test.rb
+test/test_helper.rb
+VERSION.yml
+Manifest
