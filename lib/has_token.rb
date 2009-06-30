@@ -1,3 +1,5 @@
+require 'token'
+
 module LaserLemon
   module HasToken
     def self.included(base)
@@ -5,38 +7,43 @@ module LaserLemon
     end
     
     module ClassMethods
-      def has_token(*columns)
-        options = columns.extract_options!
+      def has_token(column, options = {})
         options.reverse_merge!(
+          :column => column,
           :length => 6,
           :characters => [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).sum,
-          :to_param => false
+          :to_param => false,
+          :readonly => true
         )
         
-        columns << :token if columns.empty?
-        columns.collect!(&:to_sym)
+        cattr_accessor :has_token_options
+        return(false) if self.has_token_options.present?
+        self.has_token_options = options
         
-        columns.each do |column|
-          attr_readonly column
-          
-          default_value_for column do
-            begin
-              token_value = Array.new(options[:length]){ options[:characters].rand }.join
-            end while exists?(column => token_value)
-            token_value
-          end
-        end
+        attr_readonly(column) if options[:readonly]
+        define_method(:to_param){ read_attribute(column) } if options[:to_param]
         
-        if options[:to_param]
-          to_param_column = case
-          when (options[:to_param] == true) && (columns.size == 1): columns.first
-          when columns.include?(options[:to_param].to_sym): options[:to_param].to_sym
+        has_one :global_token, :class_name => 'Token', :as => :parent, :autosave => true
+        
+        include InstanceMethods
+        before_create :set_token
+      end
+    end
+    
+    module InstanceMethods
+      def has_token_options
+        self.class.has_token_options
+      end
+      
+      def set_token
+        begin
+          token_value = case
+          when has_token_options[:constructor].is_a?(Proc): has_token_options[:constructor].call(self)
+          else Array.new(has_token_options[:length]){ has_token_options[:characters].rand }.join
           end
-          
-          define_method :to_param do
-            read_attribute(to_param_column)
-          end
-        end
+        end while Token.exists?(:value => token_value)
+        build_global_token(:value => token_value)
+        write_attribute(has_token_options[:column], token_value)
       end
     end
   end
