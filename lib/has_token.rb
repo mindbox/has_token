@@ -23,7 +23,7 @@ module LaserLemon
         self.has_token_options = options
         
         attr_readonly(options[:column]) if options[:readonly]
-        define_method(:to_param){ read_attribute(column) } if options[:to_param]
+        define_method(:to_param){ read_attribute(options[:column]) } if options[:to_param]
         
         has_one :global_token, :class_name => 'Token', :as => :parent, :autosave => true
         
