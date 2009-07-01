@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{has_token}
-  s.version = "0.3.0"
+  s.version = "0.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Steve Richert"]
-  s.date = %q{2009-06-30}
+  s.date = %q{2009-07-01}
   s.description = %q{Generate unique tokens on your ActiveRecord models}
   s.email = %q{steve@laserlemon.com}
   s.extra_rdoc_files = ["lib/has_token.rb", "lib/token.rb", "README.rdoc", "tasks/has_token_tasks.rake"]
