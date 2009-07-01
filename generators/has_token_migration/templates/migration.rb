@@ -6,7 +6,7 @@ class CreateTokens < ActiveRecord::Migration
     end
     
     change_table :tokens do |t|
-      t.index [:parent_id, :parent_type], :unique => true
+      t.index [:parent_id, :parent_type]
       t.index :value, :unique => true
     end
   end
