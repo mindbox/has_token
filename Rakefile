@@ -36,5 +36,3 @@ Rake::RDocTask.new do |r|
   r.rdoc_files.include('README*')
   r.rdoc_files.include('lib/**/*.rb')
 end
-
-Dir[File.join(File.dirname(__FILE__), 'tasks', '*.rake'].sort.each{|t| load t }

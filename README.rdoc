@@ -2,7 +2,6 @@
 
 == Installation
 
-  script/plugin install git://github.com/FooBarWidget/default_value_for.git
   script/plugin install git://github.com/laserlemon/has_token.git
 
 == Example
