@@ -49,9 +49,7 @@ module HasToken
 
       def create_token
         column = has_token_options[:column]
-        value = read_attribute(column)
-
-        if value
+        if value = read_attribute(column)
           token = build_global_token(:value => value)
           unless token.save
             errors.add(column, token.errors.on(:value))
