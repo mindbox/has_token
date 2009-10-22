@@ -8,46 +8,64 @@ module HasToken
   module ClassMethods
     def has_token(*args)
       options = args.extract_options!.symbolize_keys
-      options[:column] = (args.first || :token)
-      options.reverse_merge!(
+      options.merge!(
+        :column => args.first || :token
+      ).reverse_merge!(
         :length => 6,
         :characters => [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).sum,
-        :constructor => proc(&:has_token_value),
+        :constructor => proc(&:generate_token),
         :to_param => false,
         :readonly => true
       )
 
-      cattr_accessor :has_token_options
-      return(false) if self.has_token_options.present?
+      class_inheritable_accessor :has_token_options
+      return false unless self.has_token_options.nil?
       self.has_token_options = options
 
-      attr_readonly(options[:column]) if options[:readonly]
-      define_method(:to_param){ read_attribute(options[:column]) } if options[:to_param]
+      if options[:to_param]
+        def to_param_with_token
+          read_attribute(options[:column])
+        end
 
-      has_one :global_token, :class_name => 'Token', :as => :parent, :autosave => true, :dependent => :nullify
+        alias_method_chain :to_param, :token
+      end
+
+      if options[:readonly]
+        attr_readonly(options[:column])
+      end
+
+      has_one :global_token, :class_name => 'Token', :as => :parent, :dependent => :nullify
 
       include InstanceMethods
-      before_create :set_token
+
+      before_create :create_token
     end
   end
 
   module InstanceMethods
-    def has_token_options
-      self.class.has_token_options
-    end
+    private
+      def generate_token
+        Array.new(has_token_options[:length]){ has_token_options[:characters].rand }.join
+      end
 
-    def has_token_value
-      Array.new(has_token_options[:length]){ has_token_options[:characters].rand }.join
-    end
+      def create_token
+        column = has_token_options[:column]
+        value = read_attribute(column)
 
-    def set_token
-      begin
-        token_value = has_token_options[:constructor].call(self)
-      end while Token.exists?(:value => token_value)
-
-      build_global_token(:value => token_value)
-      write_attribute(has_token_options[:column], token_value)
-    end
+        if value
+          token = build_global_token(:value => value)
+          unless token.save
+            errors.add(column, token.errors.on(:value))
+            return false
+          end
+        else
+          begin
+            value = has_token_options[:constructor].call(self)
+            token = build_global_token(:value => value)
+          end until token.save
+          write_attribute(column, value)
+        end
+      end
   end
 end
 

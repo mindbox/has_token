@@ -1,6 +1,8 @@
 class Token < ActiveRecord::Base
   belongs_to :parent, :polymorphic => true
 
+  validates_uniqueness_of :value
+
   def self.get(value)
     find_by_value(value).try(:parent)
   end
