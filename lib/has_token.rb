@@ -23,10 +23,9 @@ module HasToken
       self.has_token_options = options
 
       if options[:to_param]
-        def to_param_with_token
+        define_method(:to_param_with_token) do
           read_attribute(options[:column])
         end
-
         alias_method_chain :to_param, :token
       end
 
