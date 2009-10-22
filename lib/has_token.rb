@@ -15,7 +15,8 @@ module HasToken
         :characters => [('a'..'z'), ('A'..'Z'), ('0'..'9')].map(&:to_a).sum,
         :constructor => proc(&:generate_token),
         :to_param => false,
-        :readonly => true
+        :readonly => true,
+        :dependent => :nullify
       )
 
       class_inheritable_accessor :has_token_options
@@ -33,7 +34,7 @@ module HasToken
         attr_readonly(options[:column])
       end
 
-      has_one :global_token, :class_name => 'Token', :as => :parent, :dependent => :nullify
+      has_one :global_token, :class_name => 'Token', :as => :parent, :dependent => options[:dependent]
 
       include InstanceMethods
 
