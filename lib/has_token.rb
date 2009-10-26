@@ -1,4 +1,6 @@
-require 'token'
+%w(configuration token).each do |f|
+  require File.join(File.dirname(__FILE__), 'has_token', f)
+end
 
 module HasToken
   def self.included(base)
@@ -8,6 +10,7 @@ module HasToken
   module ClassMethods
     def has_token(*args)
       options = args.extract_options!.symbolize_keys
+      options.reverse_merge!(HasToken::Configuration.options)
       options.merge!(
         :column => args.first || :token
       ).reverse_merge!(
