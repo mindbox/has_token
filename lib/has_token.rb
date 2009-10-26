@@ -3,6 +3,12 @@
 end
 
 module HasToken
+  class << self
+    def configure
+      yield Configuration
+    end
+  end
+
   def self.included(base)
     base.extend ClassMethods
   end
