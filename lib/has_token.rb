@@ -30,7 +30,7 @@ module HasToken
       )
 
       class_inheritable_accessor :has_token_options
-      return false unless self.has_token_options.nil?
+      return false unless has_token_options.nil?
       self.has_token_options = options
 
       if options[:to_param]
@@ -48,7 +48,7 @@ module HasToken
 
       include InstanceMethods
 
-      send options[:callback], :create_token
+      send has_token_options[:callback], :create_token
     end
   end
 
