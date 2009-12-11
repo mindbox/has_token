@@ -25,7 +25,8 @@ module HasToken
         :constructor => proc(&:generate_token),
         :to_param => false,
         :readonly => true,
-        :dependent => :nullify
+        :dependent => :nullify,
+        :callback => :before_create
       )
 
       class_inheritable_accessor :has_token_options
@@ -47,7 +48,7 @@ module HasToken
 
       include InstanceMethods
 
-      before_create :create_token
+      send options[:callback], :create_token
     end
   end
 
@@ -59,6 +60,7 @@ module HasToken
 
       def create_token
         column = has_token_options[:column]
+
         if value = read_attribute(column)
           token = build_global_token(:value => value)
           unless token.save
@@ -70,8 +72,19 @@ module HasToken
             value = has_token_options[:constructor].call(self)
             token = build_global_token(:value => value)
           end until token.save
-          write_attribute(column, value)
+
+          set_token(value)
         end
+      end
+
+      def set_token(value)
+        setter = case has_token_options[:callback].to_s
+        when /(find|initialize|destroy)$/ then nil
+        when /validation/, /^before/ then :write_attribute
+        else :update_attribute
+        end
+
+        send(setter, has_token_options[:column], value) if setter
       end
   end
 end
