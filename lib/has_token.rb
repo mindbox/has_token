@@ -78,13 +78,14 @@ module HasToken
       end
 
       def set_token(value)
-        setter = case has_token_options[:callback].to_s
-        when /(find|initialize|destroy)$/ then nil
-        when /validation/, /^before/ then :write_attribute
-        else :update_attribute
+        case has_token_options[:callback].to_s
+          when /(find|initialize|destroy)$/ then nil
+          when /validation/, /^before/
+            write_attribute(has_token_options[:column], value)
+          else
+            write_attribute(has_token_options[:column], value)
+            update_without_dirty([has_token_options[:column]])
         end
-
-        send(setter, has_token_options[:column], value) if setter
       end
   end
 end
